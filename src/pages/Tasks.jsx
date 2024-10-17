@@ -11,6 +11,7 @@ import Tabs from "../components/Tabs";
 import TaskTitle from "../components/TaskTitle";
 import BoardView from "../components/BoardView";
 import { tasks } from "../assets/data";
+import Table from "../components/task/Table";
 // import Table from "../components/task/Table";
 // import AddTask from "../components/task/AddTask";
 
@@ -64,7 +65,7 @@ const Tasks = () => {
           )}
 
           {
-            selected === 0 ? <BoardView tasks={tasks} /> : <div></div>
+            selected === 0 ? <BoardView tasks={tasks} /> : <div> <Table tasks={tasks} /> </div>
           }
         </Tabs>
       </div>

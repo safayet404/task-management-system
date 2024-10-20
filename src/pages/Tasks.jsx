@@ -12,6 +12,7 @@ import TaskTitle from "../components/TaskTitle";
 import BoardView from "../components/BoardView";
 import { tasks } from "../assets/data";
 import Table from "../components/task/Table";
+import AddTask from "../components/task/AddTask";
 // import Table from "../components/task/Table";
 // import AddTask from "../components/task/AddTask";
 
@@ -45,7 +46,7 @@ const Tasks = () => {
         <Title title={status ? `${status} Tasks` : "Tasksss"} />
 
         {
-          !status &&  <Button
+          !status &&  <Button onClick={() => setOpen(true) }
           label="Create Task"
           icon={<IoMdAdd className="text-lg" />}
           className="flex flex-row-reverse gap-1 bg-blue-600 text-white rounded-md py-2 2xl:py-2.5"
@@ -68,6 +69,8 @@ const Tasks = () => {
             selected === 0 ? <BoardView tasks={tasks} /> : <div> <Table tasks={tasks} /> </div>
           }
         </Tabs>
+
+        <AddTask open={open} setOpen={setOpen} />
       </div>
     </div>
   )

@@ -70,7 +70,7 @@ const Users = () => {
 
       <div className='flex items-center justify-between mb-8'>
         <Title title="Team Members" />
-        <Button label="Add New User" icon={<IoMdAdd className='text-lg' />} className="flex flex-row-reverse gap-1 bg-blue-600 text-white rounded-md 2xl:py-2.5" onClick={() => setOpen = (true)} />
+        <Button label="Add New User" icon={<IoMdAdd className='text-lg' />} className="flex flex-row-reverse gap-1 bg-blue-600 text-white rounded-md 2xl:py-2.5" onClick={() => setOpen =(true)} />
 
       </div>
 

@@ -6,6 +6,8 @@ import { IoMdAdd } from 'react-icons/io';
 import { summary } from "../assets/data";
 import { getInitials } from '../utils';
 import clsx from 'clsx';
+import ConfirmatioDialog, { UserAction } from '../components/Dialogs';
+import AddUser from '../components/AddUser';
 
 
 const Users = () => {
@@ -13,6 +15,19 @@ const Users = () => {
   const [open, setOpen] = useState(false);
   const [openAction, setOpenAction] = useState(false);
   const [selected, setSelected] = useState(null);
+
+  const userActionHandler = () => {}
+  const deleteHandler = () => {}
+
+  const deleteClick = (id) =>{
+    setSelected(id)
+    setOpenDialog(true)
+  }
+
+  const editClick=(el)=>{
+    setSelected(el)
+    setOpen(true)
+  }
 
 
   const TableHeader = () => (
@@ -28,24 +43,24 @@ const Users = () => {
   );
 
 
-    const TableRow = ({ user }) => (
-      <tr className='border-b border-gray-200 text-gray-600 hover:bg-gray-400/10'>
-        <td className='p-2'>
-          <div className='flex items-center gap-3'>
-            <div className='w-9 h-9 rounded-full text-white flex items-center justify-center text-sm bg-blue-700'>
-              <span className='text-xs md:text-sm text-center'>
-                {getInitials(user.name)}
-              </span>
-            </div>
-            {user.name}
+  const TableRow = ({ user }) => (
+    <tr className='border-b border-gray-200 text-gray-600 hover:bg-gray-400/10'>
+      <td className='p-2'>
+        <div className='flex items-center gap-3'>
+          <div className='w-9 h-9 rounded-full text-white flex items-center justify-center text-sm bg-blue-700'>
+            <span className='text-xs md:text-sm text-center'>
+              {getInitials(user.name)}
+            </span>
           </div>
-        </td>
-  
-        <td className='p-2'>{user.title}</td>
-        <td className='p-2'>{user.email || "user.emal.com"}</td>
-        <td className='p-2'>{user.role}</td>
+          {user.name}
+        </div>
+      </td>
 
-        <td>
+      <td className='p-2'>{user.title}</td>
+      <td className='p-2'>{user.email || "user.emal.com"}</td>
+      <td className='p-2'>{user.role}</td>
+
+      <td>
         <button
           // onClick={() => userStatusClick(user)}
           className={clsx(
@@ -57,38 +72,45 @@ const Users = () => {
         </button>
       </td>
 
-        <td className='flex gap-4 justify-end'>
-          <Button label="Edit" type="button" className="text-blue-600 hover:text-blue-500 font-semibold sm:px-0" onClick={()=> editClick(user)} />
-          <Button label="Delete" type="button" className="text-red-600 hover:text-red-500 font-semibold sm:px-0" onClick={()=> deleteClick(user?._id)} />
+      <td className='flex gap-4 justify-end'>
+        <Button label="Edit" type="button" className="text-blue-600 hover:text-blue-500 font-semibold sm:px-0" onClick={() => editClick(user)} />
+        <Button label="Delete" type="button" className="text-red-600 hover:text-red-500 font-semibold sm:px-0" onClick={() => deleteClick(user?._id)} />
 
-        </td>
+      </td>
 
     </tr>
   )
   return (
-    <div className='w-full md:px-1 px-0 mb-6'>
+    <>
+      <div className='w-full md:px-1 px-0 mb-6'>
 
-      <div className='flex items-center justify-between mb-8'>
-        <Title title="Team Members" />
-        <Button label="Add New User" icon={<IoMdAdd className='text-lg' />} className="flex flex-row-reverse gap-1 bg-blue-600 text-white rounded-md 2xl:py-2.5" onClick={() => setOpen =(true)} />
+        <div className='flex items-center justify-between mb-8'>
+          <Title title="Team Members" />
+          <Button label="Add New User" icon={<IoMdAdd className='text-lg' />} className="flex flex-row-reverse gap-1 bg-blue-600 text-white rounded-md 2xl:py-2.5" onClick={() => setOpen(true) } />
 
-      </div>
-
-      <div className='bg-white px-2 md:px-4 py-4'>
-        <div className='overflow-x-auto'>
-          <table className='w-full mb-5'>
-            <TableHeader />
-
-            <tbody>
-              {summary.users?.map((user, index) => (
-                <TableRow key={index} user={user} />
-              ))}
-            </tbody>
-          </table>
         </div>
+
+        <div className='bg-white px-2 md:px-4 py-4'>
+          <div className='overflow-x-auto'>
+            <table className='w-full mb-5'>
+              <TableHeader />
+
+              <tbody>
+                {summary.users?.map((user, index) => (
+                  <TableRow key={index} user={user} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
 
-    </div>
+      <AddUser open={open} setOpen={setOpen} userData={selected} key={new Date().getTime().toString()} />
+      <ConfirmatioDialog open={openDialog} setOpen={setOpenDialog} onClick={deleteHandler} />
+      <UserAction open={openAction} setOpen={setOpenAction} onClick={userActionHandler} />
+
+    </>
   )
 }
 

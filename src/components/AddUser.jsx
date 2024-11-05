@@ -6,14 +6,37 @@ import Textbox from "./Textbox";
 import Loading from "./Loader";
 import Button from "./Button";
 import ModalWrapper from "./ModelWrapper";
+import { useRegisterMutation } from "../redux/slices/api/authApiSlice";
+import { toast } from "sonner";
 
 const AddUser = ({open,setOpen,userData}) => {
     let defaultValues = userData ?? {}
     const {user} = useSelector((state) => state.auth)
-    const isLoading = false,isUpdating =false;
+    //const isLoading = false
+    const isUpdating =false;
 
     const {register,handleSubmit,formState : {errors}} = useForm({defaultValues})
-    const handleOnSubmit = () => {};
+
+    const [addNewUser,{isLoading}] = useRegisterMutation()
+    const handleOnSubmit = async (data) => {
+      try{
+        if(userData)
+        {
+
+        }
+        else
+        {
+          const result = await addNewUser({...data, password : data.email}).unwrap()
+          toast.success("New User Added Successfully")
+        }
+        setTimeout(()=>{
+          setOpen(false)
+        },1500)
+      }catch(error)
+      {
+        toast.error("Something Went Wrong")
+      }
+    };
   return (
     <>
 

@@ -3,8 +3,11 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import Textbox from "../components/Textbox";
 import { Button } from "@headlessui/react";
-import { useSelector } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
+import { useLoginMutation } from "../redux/slices/api/authApiSlice";
+import { toast } from 'sonner';
+import { setCredentials } from "../redux/slices/authSlice";
+import Loading from "../components/Loader";
 const Login = () => {
     const {user} = useSelector((state) => state.auth)
     const {
@@ -13,18 +16,33 @@ const Login = () => {
         formState: { errors },
     } = useForm();
 
+
     const navigate = useNavigate();
-
-    const submitHandler = async (data) => {
-        console.log("submit") ; 'submit'
-    };
-
-  
+    const dispatch = useDispatch()
+    const [login,{isLoading}] = useLoginMutation()
     useEffect(() => {
         user && navigate("/dashboard");
     }, [user]);
 
-    console.log(user);
+    const submitHandler = async (data) => {
+        try{
+            const result = await login(data).unwrap()
+            dispatch(setCredentials(result))
+            navigate("/")
+            
+
+        }catch(error)
+        {
+            console.log(error);
+            toast.error(error?.data?.message || error.message)
+            
+        }
+    };
+
+  
+    if (user) {
+        return null; // You can also return a loading spinner here if you prefer
+    }
     
    
 
@@ -80,9 +98,9 @@ const Login = () => {
                             />
                             <span className="text-sm text-gray-500 hover:text-blue-500 hover:underline cursor-pointer">Forget Password</span>
 
-                            <Button  type='submit' label="Submit" className='w-full rounded-full h-10 bg-blue-700 text-white'>
+                            { isLoading ? <Loading/> : <Button  type='submit' label="Submit" className='w-full rounded-full h-10 bg-blue-700 text-white'>
                                 Submit
-                                </Button>
+                                </Button>}
 
 
                         </div>

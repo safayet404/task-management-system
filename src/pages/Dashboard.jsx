@@ -118,7 +118,7 @@ const UserTable = ({users}) =>{
 
           <div>
             <p> {user.name} </p>
-            <spn className="text-xs text-black"> {user?.role} </spn>
+            <span className="text-xs text-black"> {user?.role} </span>
           </div>
 
 

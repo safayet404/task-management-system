@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Title from '../components/Title';
 import Button from '../components/Button';
 import { IoMdAdd } from 'react-icons/io';
@@ -8,6 +8,8 @@ import { getInitials } from '../utils';
 import clsx from 'clsx';
 import ConfirmatioDialog, { UserAction } from '../components/Dialogs';
 import AddUser from '../components/AddUser';
+import { useDeleteUserMutation, useGetTeamListQuery, useUserActionMutation } from '../redux/slices/api/userApiSlice';
+import toast from 'react-hot-toast';
 
 
 const Users = () => {
@@ -15,13 +17,69 @@ const Users = () => {
   const [open, setOpen] = useState(false);
   const [openAction, setOpenAction] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [isCreated,setIsCreated] = useState(false)
+  const {data,isLoading,error,refetch } = useGetTeamListQuery()
+  const [deleteUser] = useDeleteUserMutation()
+  const [userAction] = useUserActionMutation() 
+  console.log(data,error);
+  
+  useEffect(()=>{
+    if(isCreated)
+    {
+      refetch()
+      setIsCreated(false)
+    }
+  },[isCreated])
 
-  const userActionHandler = () => {}
-  const deleteHandler = () => {}
+  const userActionHandler = async () => {
+    try{
+      const result = await userAction({
+        isActive : !selected?.isActive,
+        id : selected?._id
+      })
+      refetch()
+
+      toast.success("Profile Updated Successfully")
+      setSelected(null)
+      setTimeout(()=>{
+        setOpenAction(false)
+      },500)
+
+    }catch(err)
+    {
+      console.log(err);
+      
+      toast.error("Something Went Wrong")
+    }
+  }
+  const deleteHandler = async () => {
+    try{
+      await deleteUser(selected)
+      refetch()
+      toast.success("Operation Successfull")
+      setSelected(null)
+      setTimeout(()=>{
+        setOpenDialog(false)
+      },500)
+
+    }catch(err)
+    {
+      console.log(err);
+      
+      toast.error("Something Went Wrong")
+    }
+  }
+
+  const userStatusClick = (el) =>{
+    setSelected(el)
+    setOpenAction(true)
+  }
 
   const deleteClick = (id) =>{
     setSelected(id)
     setOpenDialog(true)
+ 
+  
   }
 
   const editClick=(el)=>{
@@ -38,6 +96,7 @@ const Users = () => {
         <th className='py-2'>Email</th>
         <th className='py-2'>Role</th>
         <th className='py-2'>Active</th>
+        <th className='py-2'>Action</th>
       </tr>
     </thead>
   );
@@ -62,7 +121,7 @@ const Users = () => {
 
       <td>
         <button
-          // onClick={() => userStatusClick(user)}
+          onClick={() => userStatusClick(user)}
           className={clsx(
             "w-fit px-4 py-1 rounded-full",
             user?.isActive ? "bg-blue-200" : "bg-yellow-100"
@@ -72,9 +131,9 @@ const Users = () => {
         </button>
       </td>
 
-      <td className='flex gap-4 justify-end'>
+      <td className='flex gap-4'>
         <Button label="Edit" type="button" className="text-blue-600 hover:text-blue-500 font-semibold sm:px-0" onClick={() => editClick(user)} />
-        <Button label="Delete" type="button" className="text-red-600 hover:text-red-500 font-semibold sm:px-0" onClick={() => deleteClick(user?._id)} />
+        <Button label="Delete" type="button" className="text-red-600 hover:text-red-500 font-semibold sm:px-0" onClick={() => deleteClick(user._id)} />
 
       </td>
 
@@ -96,7 +155,7 @@ const Users = () => {
               <TableHeader />
 
               <tbody>
-                {summary.users?.map((user, index) => (
+                {data?.map((user, index) => (
                   <TableRow key={index} user={user} />
                 ))}
               </tbody>
@@ -106,7 +165,7 @@ const Users = () => {
 
       </div>
 
-      <AddUser open={open} setOpen={setOpen} userData={selected} key={new Date().getTime().toString()} />
+      <AddUser open={open} setOpen={setOpen} userData={selected} setIsCreated={setIsCreated} key={new Date().getTime().toString()} />
       <ConfirmatioDialog open={openDialog} setOpen={setOpenDialog} onClick={deleteHandler} />
       <UserAction open={openAction} setOpen={setOpenAction} onClick={userActionHandler} />
 

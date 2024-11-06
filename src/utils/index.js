@@ -25,13 +25,20 @@ export function dateFormatter(dateString) {
 }
 
 export function getInitials(fullName) {
-  const names = fullName.split(" ");
+  if (!fullName || typeof fullName !== "string" || fullName.trim() === "") {
+    console.warn("Invalid name:", fullName);
+    return ""; 
+  }
+  const names = fullName.trim().split(" ").filter(Boolean);
 
-  const initials = names.slice(0, 2).map((name) => name[0].toUpperCase());
+  const initials = names.slice(0, 2).map((name) => {
+    if (name && name[0]) {
+      return name[0].toUpperCase();
+    }
+    return ""; 
+  });
 
-  const initialsStr = initials.join("");
-
-  return initialsStr;
+  return initials.join("");
 }
 
 export const PRIOTITYSTYELS = {

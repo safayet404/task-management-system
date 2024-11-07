@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
 import Textbox from "../Textbox";
 import { useForm } from "react-hook-form";
@@ -10,12 +10,12 @@ import ModalWrapper from "../ModelWrapper";
 import {getStorage} from "firebase/storage"
 const LISTS = ["TODO", "IN PROGRESS", "COMPLETED"];
 const PRIORIRY = ["HIGH", "MEDIUM", "NORMAL", "LOW"];
-
-const uploadedFileURLs = [];
-
+import axios from "axios"
+import { uploadCloudinary } from "../../utils/uploadCloudinary";
 const AddTask = ({ open, setOpen }) => {
   const task = "";
-
+  
+  
   const {
     register,
     handleSubmit,
@@ -27,37 +27,64 @@ const AddTask = ({ open, setOpen }) => {
     task?.priority?.toUpperCase() || PRIORIRY[2]
   );
   const [assets, setAssets] = useState([]);
+  const [images, setImages] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const uploadedFileURLs = [];
 
-  const submitHandler = () => {};
-
-  const handleSelect = async (e) => {
+  const submitHandler = async () => {
    
-    const file = e.target.files[0]
-    if(!file) return
-    setUploading(true)
 
-    const data = new FormData()
-    data.append("file",file)
-    data.append("upload_preset","pp-file-upload")
-    data.append("cloud_name","dkpnpkwur")
+    try{
 
-    const res = await fetch("https://api.cloudinary.com/v1_1/dkpnpkwur/image/upload",{
-      method : "POST",
-      body : data
-    })
-    const uploadImageURL = await res.json()
+      let arr = []
+      for(let i=0; i<images.length; i++)
+      {
+        const data = await uploadCloudinary(images[i])
+        arr.push(data)
+      }
 
-     
-    console.log(uploadImageURL.url);
-    setUploading(false)
+    }catch(error)
+    {
+      console.log(error);
+      
+    }
     
   };
+  console.log(images);
 
-  const uploadFile = async () =>{
+  // const handleSelect = async (e) => {
+   
+  //   const files = e.target.files
+  //   if(!files || files.length === 0) return
+  //   //setUploading(true)
 
+  //   console.log(files);
     
-  }
+
+  //   const formData = new FormData()
+  //   Array.from(files).forEach((file) => {
+  //     formData.append("file", file);
+  //     formData.append("upload_preset", "pp-file-upload");
+  //     formData.append("cloud_name", "dkpnpkwur");
+  //   });
+
+  //   try{
+  //     const res = await fetch("https://api.cloudinary.com/v1_1/dkpnpkwur/image/upload", {
+  //       method: "POST",
+  //       body: formData,
+  //     })
+  //     const response = await res.json();
+  //     console.log("Cloudinary response:", response);
+
+  //   }catch(error)
+  //   {
+  //         console.error("Error uploading images:", error);
+  //   }
+
+  //   // setUploading(false)
+    
+  // };
+
 
   return (
     <>
@@ -95,7 +122,7 @@ const AddTask = ({ open, setOpen }) => {
                 <Textbox
                   placeholder='Date'
                   type='date'
-                  name='date'
+                  name='date' 
                   label='Task Date'
                   className='w-full rounded'
                   register={register("date", {
@@ -123,7 +150,7 @@ const AddTask = ({ open, setOpen }) => {
                     type='file'
                     className='hidden'
                     id='imgUpload'
-                    onChange={handleSelect}
+                    onChange={(e)=> setImages(e.target.files)}
                     accept='.jpg, .png, .jpeg'
                     multiple={true}
                   />

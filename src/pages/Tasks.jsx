@@ -13,6 +13,7 @@ import BoardView from "../components/BoardView";
 import { tasks } from "../assets/data";
 import Table from "../components/task/Table";
 import AddTask from "../components/task/AddTask";
+import { useGetAllTaskQuery } from "../redux/slices/api/taskApiSlice";
 // import Table from "../components/task/Table";
 // import AddTask from "../components/task/AddTask";
 
@@ -30,16 +31,20 @@ const TASK_TYPE = {
 const Tasks = () => {
 
   const params = useParams()
-
+  
   const [selected,setSelected] = useState(0)
   const [open,setOpen] = useState(false)
-  const [loading,setLoading] = useState(false)
-
   const status = params?.status || ""
-
-
+  
+  const {data,isLoading} = useGetAllTaskQuery({
+    strQuery : status,
+    isTrashed : "",
+    search : ""
+    
+  })
+  
   return (
-   loading ? <div className="py-10"> 
+   isLoading ? <div className="py-10"> 
       <Loading />
     </div> : <div className="w-full">
       <div className="flex justify-between items-center mb-4">
@@ -66,7 +71,7 @@ const Tasks = () => {
           )}
 
           {
-            selected === 0 ? <BoardView tasks={tasks} /> : <div> <Table tasks={tasks} /> </div>
+            selected === 0 ? <BoardView tasks={data?.tasks} /> : <div> <Table tasks={data?.tasks} /> </div>
           }
         </Tabs>
 

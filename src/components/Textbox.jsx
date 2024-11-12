@@ -1,7 +1,7 @@
 import React from 'react'
 
 import clsx from "clsx"
-const Textbox = React.forwardRef(({type,placeholder,label,className,register,name,error},ref)=>{
+const Textbox = React.forwardRef(({type,placeholder,label,value,className,register,name,error},ref)=>{
 
     return (
         <div className='w-full flex flex-col gap-1'>
@@ -13,7 +13,7 @@ const Textbox = React.forwardRef(({type,placeholder,label,className,register,nam
             )}
 
             <div>
-                <input type={type} name={name} placeholder={placeholder} ref={ref} {...register} aria-invalid={error ? "true" : "false"}
+                <input type={type} name={name} placeholder={placeholder} value={value} ref={ref} {...register} aria-invalid={error ? "true" : "false"}
                 className={clsx("bg-transparent px-3 py-2.5 2xl:py-3 border border-gray-300 text-gray-900 outline-none placeholder-gray-400 text-base ",className)}
                 />
             </div>

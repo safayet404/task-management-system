@@ -8,14 +8,16 @@ import Button from "./Button";
 import ModalWrapper from "./ModelWrapper";
 import { useRegisterMutation } from "../redux/slices/api/authApiSlice";
 import toast from 'react-hot-toast';
-import { useUpdateUserMutation } from "../redux/slices/api/userApiSlice";
+import { useGetTeamListQuery, useUpdateUserMutation } from "../redux/slices/api/userApiSlice";
 import { setCredentials } from "../redux/slices/authSlice";
 
-const AddUser = ({ open, setOpen, userData, setIsCreated }) => {
+const AddUser = ({ open, setOpen, userData }) => {
   let defaultValues = userData ?? {}
   const { user } = useSelector((state) => state.auth)
   //const isLoading = false
   //const isUpdating =false;
+  const { refetch } = useGetTeamListQuery()
+
 
   const { register, handleSubmit, formState: { errors } } = useForm({ defaultValues })
 
@@ -33,11 +35,11 @@ const AddUser = ({ open, setOpen, userData, setIsCreated }) => {
           dispatch(setCredentials({ ...result.user }))
 
         }
+       
       }
       else {
         await addNewUser({ ...data, password: data.email }).unwrap()
         toast.success("New User Added Successfully")
-        setIsCreated(true);
       }
       setTimeout(() => {
         setOpen(false)
@@ -48,6 +50,8 @@ const AddUser = ({ open, setOpen, userData, setIsCreated }) => {
 
       toast.error("Something Went Wrong here")
     }
+
+    refetch()
   };
 
 

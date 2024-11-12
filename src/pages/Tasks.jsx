@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaList } from "react-icons/fa";
 import { MdGridView } from "react-icons/md";
 import { useParams } from "react-router-dom";
@@ -36,12 +36,13 @@ const Tasks = () => {
   const [open,setOpen] = useState(false)
   const status = params?.status || ""
   
-  const {data,isLoading} = useGetAllTaskQuery({
+  const {data,isLoading,refetch} = useGetAllTaskQuery({
     strQuery : status,
     isTrashed : "",
     search : ""
     
   })
+
   
   return (
    isLoading ? <div className="py-10"> 
@@ -76,7 +77,7 @@ const Tasks = () => {
         </Tabs>
 
         <AddTask open={open} setOpen={setOpen} />
-      </div>
+        </div>
     </div>
   )
 }

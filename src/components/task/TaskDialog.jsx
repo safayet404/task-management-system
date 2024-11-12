@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AiTwotoneFolderOpen } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
 import { HiDuplicate } from "react-icons/hi";
@@ -10,17 +10,61 @@ import { Menu, Transition } from "@headlessui/react";
 import ConfirmatioDialog from "../Dialogs";
 import AddTask from "./AddTask";
 import AddSubTask from "./AddSubTask";
+import { useDuplicateTaskMutation, useGetAllTaskQuery, useTrashTaskMutation } from "../../redux/slices/api/taskApiSlice";
+import toast from "react-hot-toast";
 
 const TaskDialog = ({ task }) => {
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-
+  const [deleteTask] = useTrashTaskMutation()
+  const [duplicateTask] = useDuplicateTaskMutation()
   const navigate = useNavigate();
+  const { refetch } = useGetAllTaskQuery({
+    strQuery: "",
+    isTrashed: "",
+    search: "",
+  });
 
-  const duplicateHandler = () => {};
-  const deleteClicks = () => {};
-  const deleteHandler = () => {};
+  const duplicateHandler = async () => {
+    try{
+
+      await duplicateTask(task._id).unwrap()
+      toast.success("Operation Successfull")
+
+      setTimeout(() => {
+        setOpenDialog(false)
+        window.location.reload()
+      },500)
+
+    }catch(error)
+    {
+      console.log(error);
+      
+    }
+  };
+
+
+  const deleteClicks = () => {
+    setOpenDialog(true)
+
+  };
+
+  const deleteHandler = async () => {
+    try{
+      const taskId = task._id.toString();  
+      const res = await deleteTask({ id: taskId }).unwrap();  // Only pass the id, no extra data unless needed
+      toast.success("Operation Successfull")
+      setTimeout(()=>{
+        setOpenDialog(false)
+      },500)
+      refetch()
+    }catch(error)
+    {
+      console.log(error);
+      
+    }
+  };
 
   const items = [
     {
@@ -41,7 +85,7 @@ const TaskDialog = ({ task }) => {
     {
       label: "Duplicate",
       icon: <HiDuplicate className='mr-2 h-5 w-5' aria-hidden='true' />,
-      onClick: () => duplicateHanlder(),
+      onClick: () => duplicateHandler(),
     },
   ];
 
@@ -76,8 +120,11 @@ const TaskDialog = ({ task }) => {
                         {el.icon}
                         {el.label}
                       </button>
+
                     )}
                   </Menu.Item>
+
+                  
                 ))}
               </div>
 

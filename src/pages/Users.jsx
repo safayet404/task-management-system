@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react'
 import Title from '../components/Title';
 import Button from '../components/Button';
 import { IoMdAdd } from 'react-icons/io';
-
-import { summary } from "../assets/data";
 import { getInitials } from '../utils';
 import clsx from 'clsx';
 import ConfirmatioDialog, { UserAction } from '../components/Dialogs';
@@ -17,19 +15,9 @@ const Users = () => {
   const [open, setOpen] = useState(false);
   const [openAction, setOpenAction] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [isCreated,setIsCreated] = useState(false)
   const {data,isLoading,error,refetch } = useGetTeamListQuery()
   const [deleteUser] = useDeleteUserMutation()
-  const [userAction] = useUserActionMutation() 
-  console.log(data,error);
-  
-  useEffect(()=>{
-    if(isCreated)
-    {
-      refetch()
-      setIsCreated(false)
-    }
-  },[isCreated])
+  const [userAction] = useUserActionMutation()   
 
   const userActionHandler = async () => {
     try{
@@ -165,7 +153,7 @@ const Users = () => {
 
       </div>
 
-      <AddUser open={open} setOpen={setOpen} userData={selected} setIsCreated={setIsCreated} key={new Date().getTime().toString()} />
+      <AddUser open={open} setOpen={setOpen} userData={selected}  key={new Date().getTime().toString()} />
       <ConfirmatioDialog open={openDialog} setOpen={setOpenDialog} onClick={deleteHandler} />
       <UserAction open={openAction} setOpen={setOpenAction} onClick={userActionHandler} />
 

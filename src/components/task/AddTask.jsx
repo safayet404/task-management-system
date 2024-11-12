@@ -12,78 +12,95 @@ const LISTS = ["TODO", "IN PROGRESS", "COMPLETED"];
 const PRIORIRY = ["HIGH", "MEDIUM", "NORMAL", "LOW"];
 import axios from "axios"
 import { uploadCloudinary } from "../../utils/uploadCloudinary";
-const AddTask = ({ open, setOpen }) => {
-  const task = "";
+import { useCreateTaskMutation, useGetAllTaskQuery, useUpdateTaskMutation } from "../../redux/slices/api/taskApiSlice";
+import toast from 'react-hot-toast';
+
+const AddTask = ({ open, setOpen,task }) => {
   
   
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+   
+  } = useForm({defaultValues : {title : task?.title || ""}  });
   const [team, setTeam] = useState(task?.team || []);
   const [stage, setStage] = useState(task?.stage?.toUpperCase() || LISTS[0]);
   const [priority, setPriority] = useState(
     task?.priority?.toUpperCase() || PRIORIRY[2]
   );
-  const [assets, setAssets] = useState([]);
-  const [images, setImages] = useState([]);
+    const [assets, setAssets] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const uploadedFileURLs = [];
+  const [uploadedFileURLs, setUploadedFileURLs] = useState([]);  
+  const [createTask, {isLoading}] = useCreateTaskMutation()
+  const [updateTask, {isLoading : isUpdating,isSuccess}] = useUpdateTaskMutation()
+  const { refetch } = useGetAllTaskQuery({ strQuery: "", isTrashed: "", search: "" });
+  const URLS = task?.assets ? [...task.assets] : []
 
-  const submitHandler = async () => {
+
+
+   const submitHandler = async (data) => {
+  
+    try{
+      const newData = {
+        ...data,
+        assets : [...URLS, ...uploadedFileURLs],
+        team,
+        stage,
+        priority
+      }
+
+      task?._id
+      ? await updateTask({ ...newData, _id: task._id }).unwrap()
+      : await createTask(newData).unwrap();
+
+      toast.success("Operation Successfull")
+
+      
+      setTimeout(()=>{
+        setOpen(false)
+      },500)
+      
+      refetch();
+
+    }  
+    catch(error)
+    {
+      console.log(error);
+      
+    }
+   }
+
+
+  const handleSelect = async (e) => {
    
+    const files = e.target.files
+    if(!files || files.length === 0) return
+
+    setUploading(true)
 
     try{
-
       let arr = []
-      for(let i=0; i<images.length; i++)
+      for(let i=0; i<files.length; i++)
       {
-        const data = await uploadCloudinary(images[i])
-        arr.push(data)
+        const data = await uploadCloudinary(files[i])
+        arr.push(data.url)
       }
+
+      setUploadedFileURLs(arr)
 
     }catch(error)
     {
       console.log(error);
       
     }
+
+    setUploading(false)
+    
     
   };
-  console.log(images);
 
-  // const handleSelect = async (e) => {
-   
-  //   const files = e.target.files
-  //   if(!files || files.length === 0) return
-  //   //setUploading(true)
-
-  //   console.log(files);
-    
-
-  //   const formData = new FormData()
-  //   Array.from(files).forEach((file) => {
-  //     formData.append("file", file);
-  //     formData.append("upload_preset", "pp-file-upload");
-  //     formData.append("cloud_name", "dkpnpkwur");
-  //   });
-
-  //   try{
-  //     const res = await fetch("https://api.cloudinary.com/v1_1/dkpnpkwur/image/upload", {
-  //       method: "POST",
-  //       body: formData,
-  //     })
-  //     const response = await res.json();
-  //     console.log("Cloudinary response:", response);
-
-  //   }catch(error)
-  //   {
-  //         console.error("Error uploading images:", error);
-  //   }
-
-  //   // setUploading(false)
-    
-  // };
+  
 
 
   return (
@@ -102,6 +119,7 @@ const AddTask = ({ open, setOpen }) => {
               placeholder='Task Title'
               type='text'
               name='title'
+              defaultValues={ task && task.title}
               label='Task Title'
               className='w-full rounded'
               register={register("title", { required: "Title is required" })}
@@ -150,7 +168,7 @@ const AddTask = ({ open, setOpen }) => {
                     type='file'
                     className='hidden'
                     id='imgUpload'
-                    onChange={(e)=> setImages(e.target.files)}
+                    onChange={handleSelect}
                     accept='.jpg, .png, .jpeg'
                     multiple={true}
                   />
@@ -162,7 +180,7 @@ const AddTask = ({ open, setOpen }) => {
 
             <div className='bg-gray-50 py-6 sm:flex sm:flex-row-reverse gap-4'>
               {uploading ? (
-                <span className='text-sm py-2 text-red-500'>
+                <span className='text-sm py-2 text-red-500 p-3'>
                   Uploading assets
                 </span>
               ) : (

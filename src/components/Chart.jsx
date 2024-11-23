@@ -9,7 +9,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { chartData } from "../assets/data";
 const Chart = ({data}) => {
   return (
     <ResponsiveContainer width={"100%"} height={500}>

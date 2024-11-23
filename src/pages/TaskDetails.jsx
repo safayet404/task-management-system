@@ -13,12 +13,13 @@ import {
 } from "react-icons/md";
 import { RxActivityLog } from "react-icons/rx";
 import { useParams } from "react-router-dom";
-import { toast } from "sonner";
 import { tasks } from "../assets/data";
 import Tabs from "../components/Tabs";
 import { PRIOTITYSTYELS, TASK_TYPE, getInitials } from "../utils";
 import Loading from "../components/Loader";
 import Button from "../components/Button";
+import { useGetSingleTaskQuery, usePostTaskActivityMutation } from "../redux/slices/api/taskApiSlice";
+import toast from "react-hot-toast";
 
 const assets = [
   "https://images.pexels.com/photos/2418664/pexels-photo-2418664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
@@ -88,9 +89,19 @@ const act_types = [
 const TaskDetails = () => {
 
   const { id } = useParams()
-
+  const { data, isLoading,refetch } = useGetSingleTaskQuery(id)
   const [selected, setSelected] = useState(0)
-  const task = tasks[3]
+  const task = data?.task
+
+  if (isLoading)
+    return (
+
+      <div className="py-10">
+        <Loading />
+      </div>
+    )
+
+
 
   return (
     <div className="w-full flex flex-col gap-3 mb-4 overflow-y-hidden">
@@ -192,7 +203,7 @@ const TaskDetails = () => {
 
             </div>
           </div>
-        </> : <> <Activities activity={task?.activities} id={id} /> </>}
+        </> : <> <Activities activity={data?.task?.activities} id={id} refetch={refetch} /> </>}
 
       </Tabs>
     </div>
@@ -200,13 +211,34 @@ const TaskDetails = () => {
 }
 
 
-const Activities = ({ activity, id }) => {
+const Activities = ({ activity, id ,refetch}) => {
 
   const [selected, setSelected] = useState(act_types[0])
   const [text, setText] = useState("")
-  const isLoading = false
 
-  const handleSubmit = async (e) => { }
+  const [postActivity,{isLoading}] = usePostTaskActivityMutation()
+
+  const handleSubmit = async (e) => { 
+    try{
+      const activityData = {
+        type : selected?.toLowerCase(),
+        activity : text
+
+      }
+      const result = await postActivity({
+        data : activityData,
+        id
+      }).unwrap()
+      setText("")
+      toast.success("Operation Successfull")
+      refetch()
+    }catch(error)
+    {
+      console.log(error);
+      toast.error("Something Went Wrong")
+      
+    }
+  }
 
   const Card = ({ item }) => {
     return (
@@ -246,19 +278,19 @@ const Activities = ({ activity, id }) => {
             <Card
               key={index}
               item={el}
-              isConnected={index < activity.length - 1}
+              isConnected={index < activity?.length - 1}
             />
           ))}
 
-          
+
         </div>
       </div>
 
       <div className="w-full md:w-1/2">
-        <h4 className="text-gray-600 font-semibold text-lg mb-5">Add Activity</h4>  
+        <h4 className="text-gray-600 font-semibold text-lg mb-5">Add Activity</h4>
         <div className="w-full flex flex-wrap gap-5">
           {act_types.map((item, index) => (
-            <div key={item} className="w-full flex flex-wrap gap-5">
+            <div key={item} className="flex flex-wrap gap-5">
               <input type="checkbox" className="w-4 h-4" checked={selected === item ? true : false} onChange={(e) => setSelected(item)} />
               <p> {item} </p>
             </div>
@@ -279,7 +311,7 @@ const Activities = ({ activity, id }) => {
             />
           )}
         </div>
-        </div>
+      </div>
     </div>
   )
 

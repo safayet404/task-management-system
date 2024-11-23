@@ -1,5 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit"
-
+import Cookies from "js-cookie";
 const initialState = {
     user : localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null,
     isSidebarOpen : false
@@ -24,6 +24,8 @@ const authSlice = createSlice({
 
     }
 })
+
+
 
 export const { 
     setCredentials,logout,setOpenSidebar

@@ -9,13 +9,13 @@ import { Toaster } from 'sonner'
 import { useDispatch, useSelector } from 'react-redux'
 import Sidebar from './components/Sidebar'
 import Navbar from './components/Navbar'
-import { setOpenSidebar } from './redux/slices/authSlice'
-import { Fragment, useRef } from 'react'
+import { logout, setOpenSidebar } from './redux/slices/authSlice'
+import { Fragment, useEffect, useRef } from 'react'
 import { Transition } from '@headlessui/react'
 import clsx from 'clsx'
 import { IoMdClose } from 'react-icons/io'
 import { IoClose } from 'react-icons/io5'
-
+import Cookies from 'js-cookie';
 function Layout (){
   const {user} = useSelector((state) => state.auth)
 
@@ -72,7 +72,7 @@ const MobileSidebar = () =>{
           )} onClick={()=> closeSidebar()}>
 
             <div className='bg-white w-3/4 h-full '>
-            <div className='w-full flex justify-end px-5 mt-5'>
+            <div className='w-full flex justify-end px-5'>
               <button onClick={()=> closeSidebar()} className='flex justify-end items-end'>
                 <IoClose size={25} />
               </button>
@@ -92,6 +92,11 @@ const MobileSidebar = () =>{
   </>
 }
 function App() {
+
+  const dispatch = useDispatch()
+
+  
+ 
 
   return (
 

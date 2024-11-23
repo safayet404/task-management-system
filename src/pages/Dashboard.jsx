@@ -5,7 +5,7 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
-
+import Cookies from 'js-cookie';
 import { LuClipboardEdit } from "react-icons/lu";
 import { FaNewspaper, FaUsers } from "react-icons/fa";
 import { FaArrowsToDot } from "react-icons/fa6";
@@ -127,7 +127,8 @@ const UserTable = ({users}) =>{
       </td>
           <td>
             <p className={clsx("w-fit px-3 py-1 rounded-full text-sm",user?.isActive ? "bg-blue-200" : "bg-yellow-100")}>
-              {user?.isActive ? "Active" : "Disabled"}
+              {console.log(user?.isActive)}
+            {user?.isActive ? "Active" : "Disabled"}
             </p>
           </td>
           <td className='py-2 text-sm'> {moment(user?.createdAt).fromNow()} </td>
@@ -155,8 +156,11 @@ const UserTable = ({users}) =>{
 
 const Dashboard = () => {
 
+
+  const token = Cookies.get('token');
+  console.log("token",document.cookie);
+
   const {data,isLoading} = useGetDashboardStatsQuery()
-  console.log(data);
   
   if(isLoading)
   {
@@ -241,11 +245,11 @@ const Dashboard = () => {
 
 
       <div className='w-full flex flex-col md:flex-row gap-4 2xl:gap-10 py-8'>
-        {/* /left */}
+     
 
         <TaskTable tasks={data.last10Task} />
 
-        {/* /right */}
+       
 
         <UserTable users={data?.users} />
       </div>

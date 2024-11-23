@@ -6,19 +6,27 @@ import {
     MdKeyboardArrowUp,
     MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
-import { toast } from "sonner";
 import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate } from "../../utils";
 import clsx from "clsx";
 import { FaList } from "react-icons/fa";
 import UserInfo from "../UserInfo";
 import Button from "../Button";
 import ConfirmatioDialog from "../Dialogs";
+import { useGetAllTaskQuery, useTrashTaskMutation } from "../../redux/slices/api/taskApiSlice";
+import toast from "react-hot-toast";
+import AddTask from "./AddTask";
 const ICONS = {
     high: <MdKeyboardDoubleArrowUp />,
     medium: <MdKeyboardArrowUp />,
     low: <MdKeyboardArrowDown />,
 };
 const Table = ({ tasks }) => {
+
+    const { refetch } = useGetAllTaskQuery({
+        strQuery: "",
+        isTrashed: "",
+        search: "",
+    });
 
     const TableHeader = () => (
         <thead className='w-full border-b border-gray-300'>
@@ -31,6 +39,11 @@ const Table = ({ tasks }) => {
             </tr>
         </thead>
     );
+
+    const editTaskHandler = (el) => {
+        setSelected(el)
+        setOpenEdit(true)
+    }
 
     const TableRow = ({ task }) => (
         <tr className="border-b border-gray-200 text-gray-600 hover:bg-gray-300/10">
@@ -68,10 +81,10 @@ const Table = ({ tasks }) => {
                 </div>
             </td>
 
-            <td className="py-2"> 
+            <td className="py-2">
                 <div className="flex">
-                    {task?.team?.map((m,index)=>(
-                        <div key={m._id} className={clsx("w-7 h-7 rounded-full flex items-center justify-center text-sm -mr-1",BGS[index % BGS?.length])}>
+                    {task?.team?.map((m, index) => (
+                        <div key={m._id} className={clsx("w-7 h-7  rounded-full flex items-center justify-center text-sm -mr-1", BGS[index % BGS?.length])}>
                             <UserInfo user={m} />
                         </div>
                     ))}
@@ -79,24 +92,44 @@ const Table = ({ tasks }) => {
             </td>
 
             <td className="py-2 flex gap-2 md:gap-4 justify-end">
-                 <Button className="text-blue-600 hover:text-blue-500 sm:px-0 text-sm md:text-base" label="Edit" type="button"  />
-                 <Button className="text-red-700 hover:text-red-500 sm:px-0 text-sm md:text-base" label="Delete" onClick={()=>deleteClicks(task._id)} type="button"  />
+                <Button className="text-blue-600 hover:text-blue-500 sm:px-0 text-sm md:text-base" label="Edit" type="button" onClick={() => editTaskHandler(task)} />
+                <Button className="text-red-700 hover:text-red-500 sm:px-0 text-sm md:text-base" label="Delete" onClick={() => deleteClicks(task._id)} type="button" />
             </td>
         </tr>
     )
 
     const [openDialog, setOpenDialog] = useState(false)
     const [selected, setSelected] = useState(null)
+    const [openEdit, setOpenEdit] = useState(false)
+    const [trashTask] = useTrashTaskMutation()
 
     const deleteClicks = (id) => {
         setSelected(id);
         setOpenDialog(true);
-      };
+    };
 
-    const deleteHandler = () =>{
+    const deleteHandler = async () => {
+        try {
+            const result = await trashTask({
+                id: selected,
+                isTrash: "trash",
+            }).unwrap();
 
-    }
-    
+
+            setTimeout(() => {
+                setOpenDialog(false)
+            }, 500)
+            refetch()
+
+            console.log("Result:", result); // Debugging
+            toast.success("Operation Successful");
+        } catch (error) {
+            console.error("Error:", error); // Debugging
+            toast.error("Something Went Wrong");
+        }
+    };
+
+
     return (
         <>
             <div className="bg-white px-2 md:px-4 pt-4 pb-9 shadow-md rounded">
@@ -112,9 +145,15 @@ const Table = ({ tasks }) => {
                 </div>
             </div>
 
-            
+
 
             <ConfirmatioDialog open={openDialog} setOpen={setOpenDialog} onClick={deleteHandler} />
+            <AddTask
+                open={openEdit}
+                setOpen={setOpenEdit}
+                task={selected}
+                key={new Date().getTime()}
+            />
         </>
     )
 }

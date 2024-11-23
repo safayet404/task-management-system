@@ -65,6 +65,32 @@ export const taskApiSlice = apiSlice.injectEndpoints({
             })
 
         }),
+        postTaskActivity : builder.mutation({
+            query : ({data,id}) => ({
+                url : `${TASK_URL}/activity/${id}`,
+                method : "POST",
+                body : data,
+                credentials : "include"
+            })
+
+        }),
+        deleteRestoreTask : builder.mutation({
+            query : ({id,actionType}) => ({
+                url : `${TASK_URL}/delete-restore/${id}?actionType=${actionType}`,
+                method : "DELETE",
+                credentials : "include"
+            })
+
+        }),
+
+        getSingleTask : builder.query({
+            query : (id) => ({
+                url : `${TASK_URL}/${id}`,
+                method : "GET",
+                credentials : "include"
+            })
+
+        }),
 
 
     })
@@ -75,5 +101,8 @@ export const {
     useCreateTaskMutation,useUpdateTaskMutation,
     useDuplicateTaskMutation,
     useTrashTaskMutation,
-    useCreateSubTaskMutation
+    useCreateSubTaskMutation,
+    useGetSingleTaskQuery,
+    usePostTaskActivityMutation,
+    useDeleteRestoreTaskMutation
  } = taskApiSlice

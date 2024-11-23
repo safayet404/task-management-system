@@ -34,7 +34,7 @@ const TaskDialog = ({ task }) => {
 
       setTimeout(() => {
         setOpenDialog(false)
-        window.location.reload()
+        refetch()
       },500)
 
     }catch(error)
@@ -57,8 +57,8 @@ const TaskDialog = ({ task }) => {
       toast.success("Operation Successfull")
       setTimeout(()=>{
         setOpenDialog(false)
+        refetch()
       },500)
-      refetch()
     }catch(error)
     {
       console.log(error);

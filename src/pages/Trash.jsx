@@ -12,6 +12,9 @@ import Title from "../components/Title";
 import Button from "../components/Button";
 import { PRIOTITYSTYELS, TASK_TYPE } from "../utils";
 import ConfirmatioDialog from "../components/Dialogs";
+import { useDeleteRestoreTaskMutation, useGetAllTaskQuery } from "../redux/slices/api/taskApiSlice";
+import Loading from "../components/Loader";
+import toast from "react-hot-toast";
 
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,
@@ -25,6 +28,25 @@ const Trash = () => {
   const [msg, setMsg] = useState(null);
   const [type, setType] = useState("delete");
   const [selected, setSelected] = useState("");
+  const [deleteRestoreTask] = useDeleteRestoreTaskMutation()
+
+  const { data, isLoading,refetch } = useGetAllTaskQuery({
+    strQuery: "",
+    isTrashed: "true",
+    search: "",
+  });
+
+  console.log("dada", data);
+
+
+
+  if (isLoading)
+    return (
+      <div className="py-10">
+        <Loading />
+      </div>
+    )
+
 
 
   const deleteAllClick = () => {
@@ -32,7 +54,7 @@ const Trash = () => {
     setMsg("Do you want to permenantly delete all items?");
     setOpenDialog(true);
   };
-
+  
   const restoreAllClick = () => {
     setType("restoreAll");
     setMsg("Do you want to restore all items in the trash?");
@@ -51,6 +73,60 @@ const Trash = () => {
     setMsg("Do you want to restore the selected item?");
     setOpenDialog(true);
   };
+
+  const deleteRestoreHandler = async () =>{
+    try{
+
+      let result;
+
+      switch(type)
+      {
+
+        case "delete" :
+          result = await deleteRestoreTask({
+            id : selected,
+            actionType : "delete"
+          }).unwrap()
+          break;
+        case "deleteAll" :
+          result = await deleteRestoreTask({
+            id : selected,
+            actionType : "deleteAll"
+          }).unwrap()
+          break;
+        case "restore" :
+          result = await deleteRestoreTask({
+            id : selected,
+            actionType : "restore"
+          }).unwrap()
+          break;
+        case "restoreAll" :
+          result = await deleteRestoreTask({
+         
+            actionType : "restoreAll"
+          }).unwrap()
+          break;
+      }
+
+      console.log(result);
+      
+
+      toast.success("Operation Successfull")
+
+      setTimeout(()=>{
+        setOpenDialog(false)
+        refetch()
+      },500)
+
+
+    }catch(error)
+    {
+      console.log(error);
+      toast.error("Something Went Wrong")
+      
+    }
+  }
+
 
   const TableHeader = () => (
     <thead className='border-b border-gray-300'>
@@ -106,51 +182,51 @@ const Trash = () => {
 
   return (
     <>
-    <div className='w-full md:px-1 px-0 mb-6'>
-      <div className='flex items-center justify-between mb-8'>
-        <Title title='Trashed Tasks' />
+      <div className='w-full md:px-1 px-0 mb-6'>
+        <div className='flex items-center justify-between mb-8'>
+          <Title title='Trashed Tasks' />
 
-        <div className='flex gap-2 md:gap-4 items-center'>
-          <Button
-            label='Restore All'
-            icon={<MdOutlineRestore className='text-lg hidden md:flex' />}
-            className='flex flex-row-reverse gap-1 items-center  text-black text-sm md:text-base rounded-md 2xl:py-2.5'
-            onClick={() => restoreAllClick()}
-          />
-          <Button
-            label='Delete All'
-            icon={<MdDelete className='text-lg hidden md:flex' />}
-            className='flex flex-row-reverse gap-1 items-center  text-red-600 text-sm md:text-base rounded-md 2xl:py-2.5'
-            onClick={() => deleteAllClick()}
-          />
+          <div className='flex gap-2 md:gap-4 items-center'>
+            <Button
+              label='Restore All'
+              icon={<MdOutlineRestore className='text-lg hidden md:flex' />}
+              className='flex flex-row-reverse gap-1 items-center  text-black text-sm md:text-base rounded-md 2xl:py-2.5'
+              onClick={() => restoreAllClick()}
+            />
+            <Button
+              label='Delete All'
+              icon={<MdDelete className='text-lg hidden md:flex' />}
+              className='flex flex-row-reverse gap-1 items-center  text-red-600 text-sm md:text-base rounded-md 2xl:py-2.5'
+              onClick={() => deleteAllClick()}
+            />
+          </div>
+        </div>
+        <div className='bg-white px-2 md:px-6 py-4 shadow-md rounded'>
+          <div className='overflow-x-auto'>
+            <table className='w-full mb-5'>
+              <TableHeader />
+              <tbody>
+                {data?.tasks?.map((tk, id) => (
+                  <TableRow key={id} item={tk} />
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-      <div className='bg-white px-2 md:px-6 py-4 shadow-md rounded'>
-        <div className='overflow-x-auto'>
-          <table className='w-full mb-5'>
-            <TableHeader />
-            <tbody>
-              {tasks?.map((tk, id) => (
-                <TableRow key={id} item={tk} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
 
-    {/* <AddUser open={open} setOpen={setOpen} /> */}
+      {/* <AddUser open={open} setOpen={setOpen} /> */}
 
-    <ConfirmatioDialog
-      open={openDialog}
-      setOpen={setOpenDialog}
-      msg={msg}
-      setMsg={setMsg}
-      type={type}
-      setType={setType}
-      onClick={() => deleteRestoreHandler()}
-    />
-  </>
+      <ConfirmatioDialog
+        open={openDialog}
+        setOpen={setOpenDialog}
+        msg={msg}
+        setMsg={setMsg}
+        type={type}
+        setType={setType}
+        onClick={() => deleteRestoreHandler()}
+      />
+    </>
   )
 }
 

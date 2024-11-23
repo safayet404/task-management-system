@@ -10,6 +10,9 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 method : "POST",
                 body : data,
                 credentials : "include",
+                headers: {
+                    "Content-Type": "application/json", // Custom header for login
+                  },
             })
         }),
 

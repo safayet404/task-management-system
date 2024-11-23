@@ -15,6 +15,8 @@ import UserInfo from "./UserInfo";
 import { IoMdAdd } from "react-icons/io";
 import { tasks } from "../assets/data";
 import AddSubTask from "./task/AddSubTask";
+import { useNavigate } from "react-router-dom";
+import { AiTwotoneFolderOpen } from "react-icons/ai";
 
 const ICONS = {
     high: <MdKeyboardDoubleArrowUp />,
@@ -24,6 +26,7 @@ const ICONS = {
 const TaskCard = ({ task }) => {
     const { user } = useSelector((state) => state.auth)
     const [open, setOpen] = useState(false)
+    const navigate = useNavigate()
     return <>
 
         <div className="w-full h-fit bg-white shadow p-4 rounded">
@@ -35,7 +38,18 @@ const TaskCard = ({ task }) => {
                 </div>
 
 
-                {user?.isAdmin && <TaskDialog task={task} />}
+                {user?.isAdmin ? (
+                    <TaskDialog task={task} />
+                ) : (
+                   
+                    <button 
+                        onClick={() => navigate(`/task/${task._id}`)} 
+                        className="text-gray-600 text-sm flex gap-1"
+                    >
+                       <AiTwotoneFolderOpen className="text-lg" /> 
+                       Open Task
+                    </button>
+                )}
 
             </div>
             <>
@@ -74,7 +88,6 @@ const TaskCard = ({ task }) => {
                 </div>
             </div>
 
-            {/* Sub Task */}
 
             {task.subTasks?.length > 0 ? ( <div className="py-4 border-t border-gray-200">
                 <h5 className="text-base line-clamp-1 text-black">{task?.subTasks[0].title}</h5>

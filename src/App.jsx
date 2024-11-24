@@ -101,7 +101,7 @@ function App() {
 
     <main className='w-full min-h-screen bg-[#f3f4f6]'>
 
-      <BrowserRouter>
+    
 
         <Routes>
           <Route element={<Layout />}>
@@ -117,7 +117,7 @@ function App() {
           </Route>
           <Route path='/login' element={<Login />} />
         </Routes>
-      </BrowserRouter>
+   
 
     </main>
   )

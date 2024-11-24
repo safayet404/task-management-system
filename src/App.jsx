@@ -1,6 +1,6 @@
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
-import { Route, Routes, Navigate, Outlet, useLocation, replace } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Navigate, Outlet, useLocation, replace } from 'react-router-dom'
 import Tasks from './pages/Tasks'
 import Users from './pages/Users'
 import Trash from './pages/Trash'
@@ -15,8 +15,8 @@ import { Transition } from '@headlessui/react'
 import clsx from 'clsx'
 import { IoMdClose } from 'react-icons/io'
 import { IoClose } from 'react-icons/io5'
-function Layout (){
-  const {user} = useSelector((state) => state.auth)
+function Layout() {
+  const { user } = useSelector((state) => state.auth)
 
 
   const location = useLocation()
@@ -27,52 +27,52 @@ function Layout (){
         <Sidebar />
       </div>
 
-      <MobileSidebar/>
+      <MobileSidebar />
 
       <div className='flex-1 overflow-y-auto'>
-        <Navbar/>
+        <Navbar />
 
-      <div className='p-4 2xl:px-10'>
-        <Outlet/>
-      </div>
+        <div className='p-4 2xl:px-10'>
+          <Outlet />
+        </div>
       </div>
 
     </div>
   ) : (
-    <Navigate to="/login" state={{from : location}} replace />
+    <Navigate to="/login" state={{ from: location }} replace />
   )
 }
 
-const MobileSidebar = () =>{
-  const {isSidebarOpen} = useSelector((state) => state.auth)
+const MobileSidebar = () => {
+  const { isSidebarOpen } = useSelector((state) => state.auth)
   const mobileMenuRef = useRef(null)
   const dispatch = useDispatch()
 
-  const closeSidebar = () =>{
+  const closeSidebar = () => {
     dispatch(setOpenSidebar(false))
   }
 
-  return  <>
-    <Transition 
-    show={isSidebarOpen}
-    as={Fragment}
+  return <>
+    <Transition
+      show={isSidebarOpen}
+      as={Fragment}
       enter='transition ease-out duration-700'
       enterFrom='opacity-x-10'
       enterTo='opacity-x-100'
       leave='transition-opacity duration-700'
       leaveFrom='opacity-x-100'
       leaveTo='opacity-x-0'
-      >
+    >
 
-        {(ref) =>(
-          <div ref={(node) => (mobileMenuRef.current = node)} 
-          className={clsx('md:hidden w-full h-full bg-black/40 transition-all duration-700 transform', isSidebarOpen ? "translate-x-0" : "translate-x-full" 
+      {(ref) => (
+        <div ref={(node) => (mobileMenuRef.current = node)}
+          className={clsx('md:hidden w-full h-full bg-black/40 transition-all duration-700 transform', isSidebarOpen ? "translate-x-0" : "translate-x-full"
 
-          )} onClick={()=> closeSidebar()}>
+          )} onClick={() => closeSidebar()}>
 
-            <div className='bg-white w-3/4 h-full '>
+          <div className='bg-white w-3/4 h-full '>
             <div className='w-full flex justify-end px-5'>
-              <button onClick={()=> closeSidebar()} className='flex justify-end items-end'>
+              <button onClick={() => closeSidebar()} className='flex justify-end items-end'>
                 <IoClose size={25} />
               </button>
             </div>
@@ -83,10 +83,10 @@ const MobileSidebar = () =>{
 
             </div>
 
-            </div>
-
           </div>
-        )}
+
+        </div>
+      )}
     </Transition>
   </>
 }
@@ -94,27 +94,30 @@ function App() {
 
   const dispatch = useDispatch()
 
-  
- 
+
+
 
   return (
 
     <main className='w-full min-h-screen bg-[#f3f4f6]'>
-    
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-          <Route path='/dashboard' element={<Dashboard />} />
-          <Route path='/tasks' element={<Tasks />} />
-          <Route path='/task/:id' element={<TaskDetails />} />
-          <Route path='/completed/:status' element={<Tasks />} />
-          <Route path='/in-progress/:status' element={<Tasks />} />
-          <Route path='/todo/:status' element={<Tasks />} />
-          <Route path='/team' element={<Users />} />
-          <Route path='/trashed' element={<Trash />} />
-        </Route>
-        <Route path='/login' element={<Login />} />
-      </Routes>
+
+      <BrowserRouter>
+
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route path='/dashboard' element={<Dashboard />} />
+            <Route path='/tasks' element={<Tasks />} />
+            <Route path='/task/:id' element={<TaskDetails />} />
+            <Route path='/completed/:status' element={<Tasks />} />
+            <Route path='/in-progress/:status' element={<Tasks />} />
+            <Route path='/todo/:status' element={<Tasks />} />
+            <Route path='/team' element={<Users />} />
+            <Route path='/trashed' element={<Trash />} />
+          </Route>
+          <Route path='/login' element={<Login />} />
+        </Routes>
+      </BrowserRouter>
 
     </main>
   )

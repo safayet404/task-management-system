@@ -5,7 +5,6 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
-import Cookies from 'js-cookie';
 import { LuClipboardEdit } from "react-icons/lu";
 import { FaNewspaper, FaUsers } from "react-icons/fa";
 import { FaArrowsToDot } from "react-icons/fa6";
@@ -157,8 +156,8 @@ const UserTable = ({users}) =>{
 const Dashboard = () => {
 
 
-  const token = Cookies.get('token');
-  console.log("token",document.cookie);
+  // const token = Cookies.get('token');
+  // console.log("token",document.cookie);
 
   const {data,isLoading} = useGetDashboardStatsQuery()
   

@@ -15,7 +15,6 @@ import { Transition } from '@headlessui/react'
 import clsx from 'clsx'
 import { IoMdClose } from 'react-icons/io'
 import { IoClose } from 'react-icons/io5'
-import Cookies from 'js-cookie';
 function Layout (){
   const {user} = useSelector((state) => state.auth)
 

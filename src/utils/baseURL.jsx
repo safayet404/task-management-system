@@ -1,4 +1,4 @@
-export const baseURL = "http://localhost:8800";
+export const baseURL = "https://project-pulse-backend.onrender.com";
 
 
 
